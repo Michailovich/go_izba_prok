@@ -4,8 +4,10 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"time"
 	"user-service/internal/user"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/yaml.v2"
 	"gorm.io/driver/postgres"
@@ -53,6 +55,16 @@ func main() {
 	userHandler := user.NewHandler(userService)
 
 	r := gin.Default()
+
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"}, // Или укажите конкретные домены
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+
 	r.POST("/register", userHandler.Register)
 	r.POST("/login", userHandler.Authenticate)
 
